@@ -1,0 +1,36 @@
+import sqlContext.implicits._
+case class Company(name: String, employeeCount: Int, isPublic: Boolean)
+:p
+val companies = List(
+  Company("ABC Corp", 25, false),
+  Company("XYZ Inc", 5000, true),
+  Company("Sparky", 400, true),
+  Company("Tech Retail", 1000, false),
+  Company("Some Place", 75, false)
+)
+[CTRL+d]
+val companiesDF = companies.toDF
+val companiesDF = sqlContext.createDataFrame(companies)
+companiesDF.show
+val companiesJsonDF = sqlContext.read.json("file:///Data/Companies.json")
+val companiesJsonDF = sqlContext.format("json").load("file:///Data/Companies.json")
+companiesJsonDF.printSchema
+val allCompaniesDF = companiesDF.unionAll(companiesJsonDF)
+val companiesJsonIntDF = companiesJsonDF.select($"name", $"employeeCount".cast("int").as("employeeCount"), $"isPublic")
+val allCompaniesDF = companiesDF.unionAll(companiesJsonIntDF)
+allCompaniesDF.groupBy(allCompaniesDF.col("isPublic")).agg(avg("employeeCount")).show
+allCompaniesDF.where($"employeeCount" > 1000).show
+allCompaniesDF.where(allCompaniesDF.col("employeeCount").gt(1000))
+import org.apache.spark.sql.Row
+allCompaniesDF.map(company=>company(0).asInstanceOf[String])
+.foreach(println)
+allCompaniesDF.write.json("file:///Data/all.json")
+allCompaniesDF.registerTempTable("Companies")
+sql("SELECT * FROM Companies")
+.show
+sql("SELECT AVG(employeeCount) AS AverageEmpCount FROM Companies GROUP BY isPublic").show
+sql("CACHE TABLE Companies")
+sql("CACHE LAZY TABLE Companies")
+
+
+

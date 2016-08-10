@@ -1,0 +1,30 @@
+//Type :pa and copy this into the shell, then type ctrl+d to execute it all
+import org.apache.spark.graphx._
+import org.apache.spark.graphx.Graph
+
+case class Person(name:String, age:Int)
+
+val family = sc.makeRDD(List(
+  (1L, Person("Justin", 31)),
+  (2L, Person("Dad", 58)),
+  (3L, Person("Mom", 57)),
+  (4L, Person("Sister", 33)),
+  (5L, Person("Wife", 32)),
+  (6L, Person("Inlaw", 22)),
+  (7L, Person("Daughter", 3))
+))
+
+val relationships = sc.makeRDD(List(
+  Edge(2L, 1L, "Child"),
+  Edge(3L, 1L, "Child"),
+  Edge(4L, 1L, "Sibling"),
+  Edge(5L, 1L, "Spouse"),
+  Edge(6L, 1L, "Inlaw"),
+  Edge(1L, 7L, "Child"),
+  Edge(6L, 5L, "Sibling"),
+  Edge(5L, 7L, "Child"),
+  Edge(2L, 4L, "Child"),
+  Edge(3L, 4L, "Child")
+))
+
+val familyGraph = Graph(family, relationships)

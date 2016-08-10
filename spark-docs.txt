@@ -1,0 +1,2 @@
+https://jaceklaskowski.gitbooks.io/mastering-apache-spark/content/spark-overview.html
+http://spark.apache.org/docs/latest/programming-guide.html#transformations
